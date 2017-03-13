@@ -30,10 +30,10 @@ Sur le clic du détail d'un formulaire, une fenêtre modale s'ouvre pour affiche
  * Bootstrap: Pour mettre en forme la page html
  * moment.js: Pour formater les dates dans un format long
 
- ## Les différentes requêtes appelées
- Les différentes données sont récupérées via le Web Service KIZEO.
- * Récupération du token pour l'authentification: https://www.kizeoforms.com/rest/v3/login: Ce token est transmis ensuite aux autres requêtes dans l'entête http.
- * Récupration de la liste des formulaire : https://www.kizeoforms.com/rest/v3/forms
- * Récupération des données saisies pour un formUlaire: 
- On récupère d'abord la liste des données du formulaire: https://www.kizeoforms.com/rest/v3/forms{{id_du_formulaire}}/data
-Puis on récupère les données du formulaire: https://www.kizeoforms.com/rest/v3/forms{{id_du_formulaire}}/data/{{data_id}}
+## Les différentes requêtes appelées
+Les différentes données sont récupérées via le Web Service KIZEO.
+* Récupération du token pour l'authentification: https://www.kizeoforms.com/rest/v3/login: Ce token est transmis ensuite aux autres requêtes dans l'entête http.
+* Récupration de la liste des formulaire : https://www.kizeoforms.com/rest/v3/forms
+* Récupération des données saisies pour un formulaire: 
+ * On récupère d'abord la liste des données du formulaire: https://www.kizeoforms.com/rest/v3/forms{{id_du_formulaire}}/data
+ * Puis on récupère les données du formulaire: https://www.kizeoforms.com/rest/v3/forms{{id_du_formulaire}}/data/{{data_id}}
