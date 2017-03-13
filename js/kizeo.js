@@ -71,8 +71,8 @@ function getFormList(token=''){
 
 				// Sur clic détail, ouverure d'une modal et surlignage de la ligne du tableau en info
  				$( ".opener" ).on( "click", function() {
- 					$('.info').removeClass('info');
- 					$( '#'+this.id).parent().parent().addClass('info');
+ 					$('.success').removeClass('success');
+ 					$( '#'+this.id).parent().parent().addClass('success');
  					// Ouverture de la modale détail
  					getFormID(this.id, token);
 					
@@ -171,7 +171,7 @@ function getFormID(id, token) {
 **/ 
 
 function getDetailClic(id) {
-	return '<button id="'+id+'" class="opener btn btn-info" title="Détail"> <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>'
+	return '<button id="'+id+'" class="opener btn btn-success" title="Détail"> <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>'
 }
 
 /**
