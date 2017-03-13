@@ -1,6 +1,41 @@
 const _URL = 'https://www.kizeoforms.com/rest/v3/'; // URL du webService
 
 $(document).ready(function() {
+$('#labelError').hide();
+$('#kizeoForms').hide();
+$('#userDisconnect').hide();
+
+
+  $('#userConnect').on('click', function(e) {
+		var err = false;
+		$('#labelError').hide();
+		$('#userDisconnect').hide();
+
+		$('#user').parent().removeClass('has-error');
+		$('#password').parent().removeClass('has-error');
+		$('#company').parent().removeClass('has-error');
+		if ($('#user').val() === "") { $('#user').parent().addClass('has-error'); err = true; }
+		if ($('#password').val() === "") { $('#password').parent().addClass('has-error'); err = true; }
+		if ($('#company').val() === "") { $('#company').parent().addClass('has-error'); err = true; }
+			
+			if (err) {
+				return false;
+		} 
+
+		// récupération du token
+		getToken($('#user').val(), $('#password').val(), $('#company').val());
+  });
+
+
+  $('#userDisconnect').on('click', function(e) {
+  	$('#kizeoForms').DataTable().destroy();
+		$('#kizeoForms').hide();
+  	$('#labelError').hide();
+		$('#userDisconnect').hide();
+		$('#connectForm').show();
+  });
+
+
 	$( "#detailForm" ).dialog({
     autoOpen: false,
     show: {
@@ -16,18 +51,40 @@ $(document).ready(function() {
   $( "#detailForm" ).dialog( "option", "maxHeight", 600 );
   $( "#detailForm" ).dialog( "option", "width", 800 );
 	
-	// recherche du token
-	getToken();
+	
 });
+
+/**
+* Récupère le token via une requete curl sous php
+* et appelle la fonciton pour initailiser la liste des formulaires
+*
+**/
+function getTokenByCurl() {
+	$.ajax({
+		 type: "GET",
+		 url: './token.php',
+		 contentType: "application/json; charset=utf-8",
+		 success: function (data) {
+		 		var token =  data;
+		 		// Récupération de la liste des formulaires
+		 		getFormList(token);
+		 		
+		 },
+
+		 error: function (jqXHR, status) {
+		 	   console.log('fail' + status.code);
+		 }
+	});
+}
 
 /**
 * Récupère le token 
 * et appelle la fonciton pour initailiser la liste des formulaires
 *
 **/
-function getToken() {
+function getToken(user, password, company) {
 	var url = _URL+'login';
-	var data = {user:'stakiz', password:'mdpstakizeo', company:'STAKIZ'};
+	var data = {user: user, password: password, company: company};
 
 	$.ajax({
 		 type: "POST",
@@ -36,14 +93,21 @@ function getToken() {
 		 contentType: "application/json; charset=utf-8",
 		 dataType: "json",
 		 success: function (data, status, jqXHR) {
+
+			$('#labelError').hide();
+			$('#connectForm').hide();
+			$('#userDisconnect').show();
 		 		var token =  data.data.token;
+		 		
+		 		$("#userConnectedLabel").html(' Déconnectez ' + user);
 		 		// Récupération de la liste des formulaires
 		 		getFormList(token);
 		 		
 		 },
 
 		 error: function (jqXHR, status) {
-		     console.log('fail' + status.code);
+				$('#labelError').show();
+		     console.log('fail TOKEN' + status.code);
 		 }
 	});
 }
@@ -57,7 +121,7 @@ function getToken() {
 **/
 function getFormList(token=''){
 	var url = _URL+'forms';
-	var urlAjax = $.ajax({
+	$.ajax({
 	    url : url,
 	    method : 'GET',
 	    beforeSend : function(req) {
@@ -94,6 +158,7 @@ function getFormList(token=''){
 
 function initDataTable(data) {
 	moment.locale('fr');
+	$('#kizeoForms').show();
 	$('#kizeoForms').DataTable( {
 		 		language: {search: "Rechercher" }, // personalisation du mot search
         info : false,											 // Enlève les infos en bas de la table
@@ -114,10 +179,7 @@ function initDataTable(data) {
           // Affichage avec moment.js de la date au format Long
           { "data": "update_time",
           	"render": function(update_time) {
-          		return moment(update_time).format('dddd') + ' '
-          						+ moment(update_time).format('DD') + ' '
-          						+ moment(update_time).format('MMMM') + ' à '
-          						+ moment(update_time).format('LTS');
+          		return formatLong(update_time);
           	} },
 
           // Affichage de case à cocher avec le bon libellé true ou false du seeHisto
@@ -135,6 +197,13 @@ function initDataTable(data) {
         ]
 	} );
 }
+
+function formatLong(date) {
+	return moment(date).format('dddd') + ' '
+         + moment(date).format('DD') + ' '
+         + moment(date).format('MMMM') + ' à '
+         + moment(date).format('LTS');
+}
 /**
 * Appel webservice pour aller chercher les info d'un formulaire 
 *
@@ -143,7 +212,7 @@ function initDataTable(data) {
 *
 **/
 function getFormID(id, token) {
-	var url = _URL+'forms/'+id;
+	var url = _URL+'forms/'+id+'/data';
 	$.ajax({
 	    url : url,
 	    method : 'GET',
@@ -151,12 +220,44 @@ function getFormID(id, token) {
 	        req.setRequestHeader('Authorization', token);
 	    },
 	    success: function (data, status, jdXHR) {
-	    	// Affichage du JSON
-	    	$("#jsonData").html(JSON.stringify(data, undefined, 2));
-				// Customisation du titre
-				$( "#detailForm" ).dialog( {"title": "Détail pour l'id: "+id});
-				// Ouverure de la modale
-	    	$( "#detailForm" ).dialog( "open" );
+	    	if(data.data.length > 0) {
+	    		var id_data = data.data.id;
+	    		
+	    		var urlFormDataId = 	_URL+'forms/'+id+'/data/'+id_data;
+	    		$.ajax({ 
+						url : urlFormDataId,
+						method : 'GET',
+						beforeSend : function(req) {
+							req.setRequestHeader('Authorization', token);
+							},
+						success: function (data, status, jdXHR) {
+							// transforme les dates en format long
+							if(data.data[0].create_time) data.data[0].create_time = formatLong(data.data[0].create_time);
+							if(data.data[0].update_time) data.data[0].update_time = formatLong(data.data[0].update_time);
+							if(data.data[0].update_answer_time) data.data[0].update_answer_time = formatLong(data.data[0].update_answer_time);
+							if(data.data[0].answer_time) data.data[0].answer_time = formatLong(data.data[0].answer_time);
+							
+							// Affichage du JSON
+				    	$("#jsonData").html(JSON.stringify(data, undefined, 2));
+							// Customisation du titre
+							$( "#detailForm" ).dialog( {"title": "Détail pour l'id: "+id});
+							// Ouverure de la modale
+				    	$( "#detailForm" ).dialog( "open" );	
+						},
+	    		error: function (jqXHR, status) {
+					     console.log('fail' + status.code);
+					 }
+	    		});
+		    	
+	    	} else {
+	    		$("#jsonData").html(JSON.stringify(data, undefined, 2));
+					// Customisation du titre
+					$( "#detailForm" ).dialog( {"title": "Détail pour l'id: "+id});
+					// Ouverure de la modale
+		    	$( "#detailForm" ).dialog( "open" );	
+						
+	    	}
+	    	
 	    },
 	    error: function (jqXHR, status) {
 		     console.log('fail' + status.code);
@@ -181,14 +282,16 @@ function getDetailClic(id) {
 * @type: see ou upadte histo
 **/
 function getCheckBox(options, type){
-	var checked = '';
+	var checkedTrue =  checkedFalse = '';
 	if (type === 'see') {
-			if (options.allUsersSeeHisto == 'O') checked = 'checked';
+			if (options.allUsersSeeHisto == 'O') checkedTrue = 'checked';
+			else checkedFalse = 'checked';
 	} else 	if (type === 'update'){
-			if (options.allUsersUpdateHisto == 'O') checked = 'checked';
+			if (options.allUsersUpdateHisto == 'O') checkedTrue = 'checked';
+			else checkedFalse = 'checked';
 	}
-	var cb = ' <fieldset disabled><div class="checkbox"><label><input type="checkbox" id="cbox1" value="checkbox1" '+checked+' readonly>'+options.checkboxOutputFalseValue+'</label> ';
-	cb += '<label><input type="checkbox" id="cbox2" value="checkbox2" '+checked+' readonly>'+options.checkboxOutputTrueValue+'</label></div></fieldset>';
+	var cb = ' <fieldset disabled><div class="checkbox"><label><input type="checkbox" id="cbox1" value="checkbox1" '+checkedFalse+' readonly>'+options.checkboxOutputFalseValue+'</label> ';
+	cb += '<label><input type="checkbox" id="cbox2" value="checkbox2" '+checkedTrue+' readonly>'+options.checkboxOutputTrueValue+'</label></div></fieldset>';
 	return cb;
 }
 
