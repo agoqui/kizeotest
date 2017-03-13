@@ -2,7 +2,7 @@
 Défi KIZEO réalisé par Agostinho QUINTELA le 13/03/2017
 
 ## Le projet
- Tout est en html et Javascript, j'ai utilisé:
+ Le projet est en html et Javascript. J'ai utilisé:
  * JQuery : Pour tout les appels ajax
  * dataTable: Pour gérer le tableau
  * Bootstrap: Pour le CSS
