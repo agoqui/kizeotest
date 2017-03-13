@@ -37,3 +37,6 @@ Les différentes données sont récupérées via le Web Service KIZEO.
 * Récupération des données saisies pour un formulaire: 
  * On récupère d'abord la liste des données du formulaire: https://www.kizeoforms.com/rest/v3/forms{{id_du_formulaire}}/data
  * Puis on récupère les données du formulaire: https://www.kizeoforms.com/rest/v3/forms{{id_du_formulaire}}/data/{{data_id}}
+
+## Bonus
+Dans le fichier kizeo.php, j'ai réalisé une récupération du token en php via cUrl.
