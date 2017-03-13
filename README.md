@@ -13,3 +13,7 @@ Défi KIZEO réalisé par Agostinho QUINTELA le 13/03/2017
  * Récupération d'un token pour l'authentification que l'on transmet ensuite au diffrents appels http
  * Récupration de la liste des formulaire : https://www.kizeoforms.com/rest/v3/forms
  * Récupération du détail d'un formaulaire: https://www.kizeoforms.com/rest/v3/forms/{{id_du_formulaire}}
+
+ ## Affichage des données
+ Les données s'affiche dans un tableau géré par l'api dataTable.js permettant la gestion des tri et recherche sur le tableau.
+ Une fenêtre modale s'affiche lors du clic sur le détail d'une ligne du tableau.
