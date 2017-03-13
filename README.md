@@ -1,6 +1,10 @@
 # kizeodefi
 Défi KIZEO réalisé par Agostinho QUINTELA le 13/03/2017
 
+## installation
+`git clone https://github.com/agoqui/kizeotest.git`
+Puis lancer la page kizeo.html
+
 ## Le projet
  Le projet est en html et Javascript. J'ai utilisé:
  * JQuery : Pour tout les appels ajax
