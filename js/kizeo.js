@@ -1,16 +1,27 @@
 const _URL = 'https://www.kizeoforms.com/rest/v3/'; // URL du webService
 
 $(document).ready(function() {
-$('#labelError').hide();
-$('#kizeoForms').hide();
-$('#userDisconnect').hide();
+	initConnectForm();
+	initDetailForm();
+	
+});
 
+/**
+* Gestion du formulaire de connection
+*
+**/
+function initConnectForm() {
+	$('#labelError').hide();
+	$('#kizeoForms').hide();
+	$('#userDisconnect').hide();
 
+	// Connection
   $('#userConnect').on('click', function(e) {
 		var err = false;
 		$('#labelError').hide();
 		$('#userDisconnect').hide();
 
+		// Vérification champ formulaire
 		$('#user').parent().removeClass('has-error');
 		$('#password').parent().removeClass('has-error');
 		$('#company').parent().removeClass('has-error');
@@ -23,10 +34,11 @@ $('#userDisconnect').hide();
 		} 
 
 		// récupération du token
-		getToken($('#user').val(), $('#password').val(), $('#company').val());
+		if($('#bycurl').is(':checked')) getTokenByCurl($('#user').val(), $('#password').val(), $('#company').val());
+		else getToken($('#user').val(), $('#password').val(), $('#company').val());
   });
 
-
+  // Déconnection
   $('#userDisconnect').on('click', function(e) {
   	$('#kizeoForms').DataTable().destroy();
 		$('#kizeoForms').hide();
@@ -36,45 +48,52 @@ $('#userDisconnect').hide();
   });
 
 
+}
+
+/**
+* Initialise la modale de détail
+**/
+function initDetailForm(){
 	$( "#detailForm" ).dialog({
-    autoOpen: false,
-    show: {
-      effect: "blind",
-      duration: 1000
-    },
-    hide: {
-	    effect: "blind",
-      duration: 1000
-    },
-  });
+	    autoOpen: false,
+	    show: {
+	      effect: "blind",
+	      duration: 1000
+	    },
+	    hide: {
+		    effect: "blind",
+	      duration: 1000
+	    },
+	  });
 
-  $( "#detailForm" ).dialog( "option", "maxHeight", 600 );
-  $( "#detailForm" ).dialog( "option", "width", 800 );
-	
-	
-});
-
+	  $( "#detailForm" ).dialog( "option", "maxHeight", 600 );
+	  $( "#detailForm" ).dialog( "option", "width", 800 );
+}
 /**
 * Récupère le token via une requete curl sous php
 * et appelle la fonciton pour initailiser la liste des formulaires
 *
 **/
-function getTokenByCurl() {
-	$.ajax({
-		 type: "GET",
-		 url: './token.php',
-		 contentType: "application/json; charset=utf-8",
-		 success: function (data) {
-		 		var token =  data;
-		 		// Récupération de la liste des formulaires
-		 		getFormList(token);
-		 		
-		 },
-
-		 error: function (jqXHR, status) {
-		 	   console.log('fail' + status.code);
-		 }
+function getTokenByCurl(user, password, company) {
+	var dataPost = {user: user, password: password, company: company};
+	$.post('./token.php', 
+			dataPost, 
+     	function(data, status) {
+        	if(data !='') {
+	        	$('#labelError').hide();
+						$('#connectForm').hide();
+						$('#userDisconnect').show();
+						$("#userConnectedLabel").html(' Déconnectez ' + user);
+        		var token =  data;	
+        		// Récupération de la liste des formulaires
+		 				getFormList(token);
+        	} else {
+        		$('#labelError').show();
+        		 console.log('failed');
+        	}
 	});
+
+
 }
 
 /**
@@ -205,7 +224,7 @@ function formatLong(date) {
          + moment(date).format('LTS');
 }
 /**
-* Appel webservice pour aller chercher les info d'un formulaire 
+* Appel webservice pour aller chercher les différentes données saisies sur un formulaire
 *
 * @id : Id du formulaire
 * @token: authentification

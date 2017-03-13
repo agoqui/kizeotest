@@ -39,4 +39,4 @@ Les différentes données sont récupérées via le Web Service KIZEO.
  * Puis on récupère les données du formulaire: https://www.kizeoforms.com/rest/v3/forms{{id_du_formulaire}}/data/{{data_id}}
 
 ## Bonus
-Dans le fichier kizeo.php, j'ai réalisé une récupération du token en php via cUrl.
+En cochant "token by php" à droite du bouton "Connectez-vous", on récupère le token via un script php (./token.php) qui s'appuie sur cUrl.

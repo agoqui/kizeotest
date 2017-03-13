@@ -1,10 +1,11 @@
 <?php
 
 	$url = 'https://www.kizeoforms.com/rest/v3/login';
+	
 	$data = array(
-		'user' => 'stakiz',
-		'password' => 'mdpstakizeo',
-		'company' => 'STAKIZ');	
+		'user' => $_POST['user'],
+		'password' => $_POST['password'],
+		'company' =>  $_POST['company']);	
 	$data_string = json_encode($data);
 
 
